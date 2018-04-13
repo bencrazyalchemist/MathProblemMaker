@@ -1,0 +1,649 @@
+<html>
+    <head>
+        <title>Math Problem Generator 0.6.5</title><!-- every time you make an upgrade change the third number, after enough changes I will change the
+second number and eventualy I will change it to version 1.0.0 and I will publish it to a website. -->
+        <script>
+            var currentWindow = window; //no longer neccesary but need to check for uses
+            var spaces = 5; //line breaks between problems, is used in ' "<br/>".repeat(spaces) ' to insert that many line breaks, unsure how to use in second omode.
+            var probs = 10;// how many problems to generate
+            var probsPerLine = 10;
+            var sameDen = false; //fraction prblems use same denminator inputs
+            var simpAft = true; //simplify answer after fraction problem
+            var Omode = 0; //output mode two is the mode where problems appere in classic worksheet format with a liine underneath and a symbol on the side
+            var PNM = 0; //Problem Number Mode, the way of outputing the problem number 1 is 'i+". "'. 2 is '"("+i+") "'
+            var numDirec = 0; //Direction of numbering for problems. 0 is horizontal and 1 is verticle.
+            var answersArr = [];
+            function printAns(){
+                i = 1;
+                while(i<answersArr.length){
+                    document.getElementById("output2").innerHTML += outN(i) + answersArr[i-1] + "<br/>";
+                    i++ 
+                }
+            }
+            function prepArray(){
+                var i = 0;
+                answersArr = [];
+                while(i<=probs){
+                    answersArr.push(null);
+                    i++;
+                }
+            }
+            function rNum(i){
+                var rows = Math.ceil(probs/probsPerLine);
+                var x = Math.ceil(i/probsPerLine);
+                var y = (i-1) % probsPerLine; //starts at top of page
+                if(numDirec==0){
+                var newI = x + y*rows;
+                }
+                if(numDirec==1){
+                var newI = x*probsPerLine + y + function(){if(y==0);return 1;};
+                }
+                return newI;
+            }
+            function out(i){
+                i = rNum(i);
+                if(PNM==0){
+                    return i + ". ";
+                }
+                if(PNM==1){
+                    return "(" + i + ") ";
+                }
+            }
+            function outN(i){
+                if(PNM==0){
+                    return i + ". ";
+                }
+                if(PNM==1){
+                    return "(" + i + ") ";
+                }
+            }
+            function random(digits){ //creates a random number with as many digits as requested, does not return one to prevent overeasy problems.
+                if(digits!=0){
+                    var x = Math.floor(Math.random(1) * ("9".repeat(digits)))+1;
+                    if(getLen(x) == digits){
+                        if(x == 1){
+                            return random(digits); //if output is one call function again, not best way but works pretty well.
+                        }
+                        else{
+                            return x;
+                        }
+                    }
+                    else{        
+                        return random(digits); //if output is wrong number of digits call this function again.
+                    }
+                }
+                else{
+                    return 0;
+                }
+            }
+            function getLen(number) {
+                return number.toString().length;
+            }
+            var countDecimals = function (value) {  
+                if ((value % 1) != 0) 
+                    return value.toString().split(".")[1].length;  
+                return 0;
+            };
+            function reduce(numerator, denominator){
+                var gcd = function gcd(a,b){
+                    return b ? gcd(b, a%b) : a;
+                };
+                gcd = gcd(numerator,denominator);
+                return [numerator/gcd, denominator/gcd];
+            }
+            function division(decimals){
+                for(var i = 1; i<=probs; i++){
+                    var r1 = 3;
+                    var r2 = 2;
+                    var d = 0;
+                    if(decimals==1){r1=2;r2=1;d=0;}
+                    if(decimals==2){r1=3;r2=1;d=0;}
+                    if(decimals==3){r1=4;r2=1;d=0;}
+                    if(decimals==4){r1=3;r2=2;d=0;}
+                    if(decimals==5){r1=4;r2=2;d=0;}
+                    var n2 = random(r2);
+                    var n1 = random(r1);
+                    var a = n1 / n2;
+                    if(countDecimals(a) == d){
+                        changeOutputCol(i)
+                    if (Omode==0){
+                        document.getElementById("output").innerHTML += out(i) + "<ans>" + "&nbsp".repeat(2+n1.toString().length+n2.toString().length-a.toString().length) + a +"</ans><br/>&nbsp&nbsp&nbsp&nbsp" + n2 + "<span style='text-decoration: overline'>)" + n1.toLocaleString() + "</span>" + "<br/>".repeat(spaces-1);
+                    }
+                    if (Omode==1){
+                        document.getElementById("output").innerHTML += out(i) + n1.toLocaleString() + ' ÷ ' + n2 + " = " + "<br/>".repeat(spaces);
+                    }
+                        answersArr[rNum(i)-1] = a;
+                    }
+                    else{
+                        i = i - 1;
+                    }
+                }
+                printAns();
+            }
+            function addFractions(){
+                for(var i = 1; i<=probs; i++){
+                    var n1 = random(1);
+                    var n2 = random(1);
+                    var n3 = random(1);
+                    if (sameDen == true){var n4 = n2;}
+                    else {var n4 = random(1);}
+                    while(n1 == n2){
+                        var n1 = random(1);
+                        var n2 = random(1);
+                        if (sameDen == true){var n4 = n2;}
+                    }
+                    while(n3 == n4){
+                        var n3 = random(1);
+                        var n4 = random(1);
+                        if (sameDen == true){var n4 = n2;}
+                    }
+                    var m1 = n1 * n4;
+                    var m2 = n2 * n4;
+                    var m3 = n3 * n2;
+                    var m4 = n4 * n2;
+                    var f1 = m1 + m3;
+                    var f2 = m2;
+                    var a = reduce(f1,f2);
+                    var a2 = "<sup>"+ a[0] +"</sup>&frasl;<sub>"+ a[1] +"</sub>";
+                    changeOutputCol(i)                  
+                    document.getElementById("output").innerHTML += out(i) + "<sup>"+ n1 +"</sup>&frasl;<sub>"+ n2 +"</sub>" + " + " + "<sup>"+ n3 +"</sup>&frasl;<sub>"+ n4 +"</sub>" + " =  " + "<br/>".repeat(spaces);
+                    document.getElementById("output").innerHTML += out(i) + n1 + "/" + n2 + " + " + n3 + "/" + n4 + " =  " + "<br/>".repeat(spaces);
+                    answersArr[rNum(i)-1] = a2;  
+                }
+                printAns()
+            }
+            function subFractions(){
+                for(var i = 1; i<=probs; i++){
+                    var n1 = random(1);
+                    var n2 = random(1);
+                    var n3 = random(1);
+                    var n4 = random(1);
+                    if (sameDen == true){var n4 = n2;}
+                    while(n1 == n2){
+                        var n1 = random(1);
+                        var n2 = random(1);
+                        if (sameDen == true){var n4 = n2;}
+                    }
+                    while(n3 == n4){
+                        var n3 = random(1);
+                        var n4 = random(1);
+                        if (sameDen == true){var n4 = n2;}
+                    }
+                    var m1 = n1 * n4;
+                    var m2 = n2 * n4;
+                    var m3 = n3 * n2;
+                    var m4 = n4 * n2;
+                    var f1 = m1 - m3;
+                    var f2 = m2;
+                    var a = reduce(f1,f2);
+                    var a2 = "<sup>"+ a[0] +"</sup>&frasl;<sub>"+ a[1] +"</sub>";
+                    if(a[0]/a[1] > 0){
+                        document.getElementById("output").innerHTML += out(i) + "<sup>"+ n1 +"</sup>&frasl;<sub>"+ n2 +"</sub>" + " - " + "<sup>"+ n3 +"</sup>&frasl;<sub>"+ n4 +"</sub>" + " =  " + "<ans>" + a2 + "</ans>" + "<br/>".repeat(spaces);
+                        changeOutputCol(i)
+                        document.getElementById("output2").innerHTML += out(i) + a2 + "<br/>";
+                    }
+                    else{
+                        i = i-1;
+                    }
+                }
+            }
+            function simpFractions(){
+                for(var i = 1; i<=probs; i++){
+                    var n1 = random(1);
+                    var n2 = random(1);
+                    var n1 = n1*random(1);
+                    var n2 = n2*random(1);
+                    var a = reduce(n1,n2);
+                    var a2 = "<sup>"+ a[0] +"</sup>&frasl;<sub>"+ a[1] +"</sub>";
+                    if(a[0]/a[1] > 0 && a[1] != n2){
+                        changeOutputCol(i)
+                        document.getElementById("output").innerHTML += out(i) + "<sup>"+ n1 +"</sup>&frasl;<sub>"+ n2 +"</sub>" + " =  " + "<ans>" + a2 + "</ans>" + "<br/>".repeat(spaces);
+                        document.getElementById("output2").innerHTML += "<br/>" + out(i) + "<sup>"+ a[0] +"</sup>&frasl;<sub>"+ a[1] +"</sub>";
+                    }
+                    else{
+                        i = i-1;
+                    }
+                }
+            }
+            function multFractions(){
+                for(var i = 1; i<=probs; i++){
+                    var n1 = random(1);
+                    var n2 = random(1);
+                    var n3 = random(1);
+                    var n4 = random(1);
+                    if (sameDen == true){var n4 = n2;}
+                    var m1 = n1 * n3;
+                    var m2 = n2 * n4;
+                    if(simpAft == true){var a = reduce(m1,m2);}
+                    else{var a = [m1,m2];}
+                    if(a[0]/a[1] > 0){
+                        changeOutputCol(i)
+                        document.getElementById("output").innerHTML += out(i) + "<sup>"+ n1 +"</sup>&frasl;<sub>"+ n2 +"</sub>" + " × " + "<sup>"+ n3 +"</sup>&frasl;<sub>"+ n4 +"</sub>" + " =  " + "<ans>" + a + "</ans>" + "<br/>".repeat(spaces);
+                        document.getElementById("output2").innerHTML += out(i) + "<sup>"+ a[0] +"</sup>&frasl;<sub>"+ a[1] +"</sub>";
+                    }
+                    else{
+                        i = i-1;
+                    }
+                }
+            }
+            function multiplication(digits){
+                var totLen = Math.ceil(digits/2) + 3;
+                var l1 = Math.ceil(digits/2);
+                var l2 = Math.floor(digits/2);
+                for(var i = 1; i<=probs; i++){
+                    var n1 = random(Math.ceil(digits/2));
+                    var n2 = random(Math.floor(digits/2));
+                    var a = n1 * n2;
+                    changeOutputCol(i)
+                    if (Omode==0){
+                        document.getElementById("output").innerHTML += "<div>" + out(i) + "&nbsp".repeat(totLen-l2) + n2 + "<br/>" + "&nbsp&nbsp&nbsp" + "<u>" + ' × ' + n1 + "</u> = " + "<ans>" + a + "</ans>" + "<br/>".repeat(spaces);
+                    }
+                    if (Omode==1){
+                        document.getElementById("output").innerHTML += out(i) + n1 + ' × ' + n2 + " = " + "<ans>" + a + "</ans>" + "<br/>".repeat(spaces);
+                    }
+                    answersArr[rNum(i)-1] = a.toLocaleString();
+                }
+            }   
+            function Square(digits){ //Called squares, actualy exponents.
+                for(var i = 1; i<=probs; i++){
+                    var n = random(digits);
+                    var exp = parseInt(document.getElementById("digitsx").value);
+                    var a = Math.pow(n,exp);
+                    changeOutputCol(i)
+                    document.getElementById("output").innerHTML += out(i) + n.toLocaleString() + "<sup>" + exp + "</sup>" + " = " + "<ans>" + a + "</ans>" + "<br/>".repeat(spaces);
+                    document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
+                }
+            }   
+            function SQRT(digits){
+                for(var i = 1; i<=probs; i++){
+                    var a = random(digits);
+                    var n = a * a;
+                    changeOutputCol(i)
+                    if (Omode==0){
+                        document.getElementById("output").innerHTML += out(i) + ' √<span style="text-decoration: overline">' + n.toLocaleString() + "</span> = " + "<br/>".repeat(spaces);
+                    }
+                    if (Omode==1){
+                        document.getElementById("output").innerHTML += out(i) + ' &#8730; ' + n.toLocaleString() + " = " + "<br/>".repeat(spaces);
+                    }
+                    document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
+                }
+            }       
+            function createProblems(inp){
+                clearCols()
+                prepArray()
+                var digits = document.getElementById("digits").value;
+                var digitsx = document.getElementById("digitsx").value;
+                document.getElementById("output").innerHTML = "Questions<br/>";
+                document.getElementById("output2").innerHTML = "Answers<br/>";
+                if(document.getElementById("option").value == "Division"){
+                    division(document.getElementById("digits").value);
+                }
+                if(document.getElementById("option").value == "Multiplication"){
+                    multiplication(document.getElementById("digits").value);
+                    var digits = document.getElementById("digits").value;
+                    document.getElementById("header").innerText = "Benk Math: \n Multiplication of " + Math.ceil(digits/2) + " digit"+ ((Math.ceil(digits/2)!=1)?"s":"").toString() +
+                     " by " + Math.floor(digits/2) + " digit" + ((Math.floor(digits/2)!=1)?"s":"").toString() + ".\nTeacher approved as one math sheet depending on skill level.";
+                }
+                if (document.getElementById("option").value == "Frac"){
+                    if(document.getElementById("optionFrac").value == "AddFractions"){
+                        addFractions();
+                        document.getElementById("header").innerText = "Benk Math: \n Addition of fractions" + ((sameDen==true)?" with same denominator":"").toString() + ".\nTeacher approved as one math sheet depending on skill level.";
+                    }
+                    if(document.getElementById("optionFrac").value == "SubFractions"){
+                        subFractions();
+                        document.getElementById("header").innerText = "Benk Math: \n Subtraction of fractions" + ((sameDen==true)?" with same denominator":"").toString() + ".\nTeacher approved as one math sheet depending on skill level.";
+                    }
+                    if(document.getElementById("optionFrac").value == "SimpFractions"){
+                        simpFractions();
+                        document.getElementById("header").innerText = "Benk Math: \n Simplication of fractions" + ((sameDen==true)?" with same denominator":"").toString() + ".\nTeacher approved as one math sheet depending on skill level.";
+                    }
+                    if(document.getElementById("optionFrac").value == "MFRAC"){
+                        multFractions()
+                        document.getElementById("header").innerText = "Benk Math: \n Simplication of fractions" + ((sameDen==true)?" with same denominator":"").toString() + ".\nTeacher approved as one math sheet depending on skill level.";
+                    }
+                }
+                if(document.getElementById("option").value == "SQRT"){
+                    SQRT(document.getElementById("digits").value);
+                }
+                if(document.getElementById("option").value == "SQR"){ //Called squares, actualy exponents.
+                    document.getElementById("header").innerText = "Benk Math: \n" + digits + " digit"+ ((digits!=1)?"s":"").toString() + " raised to the power of " + digitsx;
+                    ".\nTeacher approved as one math sheet depending on skill level.";
+                    Square(document.getElementById("digits").value);
+                }
+            }
+            var answers = "";
+            function showAnswers(){
+                document.getElementById("output2").style.visibility = "visible";
+                document.getElementById("output2").classList = "";
+                document.getElementById("output2").style.width = "100px";
+                document.getElementById("HSButton").value = "Hide Answers";
+                document.getElementById("HSButton").onclick = hideAnswers;
+                for(var i = 0;i<probs;i++){
+                    document.getElementsByTagName("ans")[i].style.visibility = "visible";
+                }
+            }
+            function hideAnswers(){
+                document.getElementById("output2").style.visibility = "hidden";
+                document.getElementById("output2").style.width = "0px";
+                document.getElementById("output2").classList = "noPrint";
+                document.getElementById("HSButton").value = "Show Answers";
+                document.getElementById("HSButton").onclick = showAnswers;
+                document.getElementsByTagName("ans").visibility = "hidden";
+                for(var i = 0;i<probs;i++){
+                    document.getElementsByTagName("ans")[i].style.visibility = "hidden";
+                }
+            }
+            function undoSameDen(){
+                document.getElementById("sameDenChanger").innerText = "False";
+                document.getElementById("sameDenChanger").onclick = doSameDen;
+                sameDen = false;
+            }
+            function doSameDen(){
+                document.getElementById("sameDenChanger").innerText = "True";
+                document.getElementById("sameDenChanger").onclick = undoSameDen;
+                sameDen = true;
+            }
+            function undoSimpAft(){
+                document.getElementById("simpAftChanger").innerText = "False";
+                document.getElementById("simpAftChanger").onclick = doSimpAft;
+                simpAft = false;
+            }
+            function doSimpAft(){
+                document.getElementById("simpAftChanger").innerText = "True";
+                document.getElementById("simpAftChanger").onclick = undoSimpAft;
+                simpAft = true;
+            }
+            function showAdvance(){
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("menu").style.display = "block";
+            }
+            function hideAdvance(){
+                document.getElementById("overlay").style.display = "none";
+                document.getElementById("menu").style.display = "none";
+            }
+            function changeFontSize(size){
+                if (size=="s"){
+                    document.getElementById("outputs").style.fontSize = "100%";
+                }
+                if (size=="m"){
+                    document.getElementById("outputs").style.fontSize = "150%";
+                }
+                if (size=="l"){
+                    document.getElementById("outputs").style.fontSize = "200%";
+                }
+            }
+            function changeOutputCol(i){
+                if((i-1) % probsPerLine == 0 && i != 1){
+                    document.getElementById("output").id = "outputx";
+                    document.getElementById("outputs").innerHTML += '<div id="output" class="output"><br/></div>';
+                }
+            }
+            function clearCols(){
+                document.getElementById("outputs").innerHTML = '<div id="output" class="output">Questions <br/></div><div id="output2">Answers <br/></div>';
+            }
+            function changeMode(){
+                var changed = false;
+                document.getElementById("inputEasyLabel").style.visibility = "visible";
+                    document.getElementById("digits").style.visibility = "visible";
+                if (document.getElementById("option").value == "Division"){
+                    document.getElementById("inputEasyLabel").innerText = "Difficulty (1-5):";
+                    changed = true;
+                    document.getElementById("digits").min = 1;
+                    document.getElementById("digits").max = 5;
+                    isNumber(document.getElementById("digits"));
+                    document.getElementById("digitsx").style.visibility = "hidden";
+                    document.getElementById("digitsxl").style.visibility = "hidden";
+                }
+                if (document.getElementById("option").value == "Multiplication"){
+                    document.getElementById("inputEasyLabel").innerText = "Problem digits:";
+                    document.getElementById("digits").min = 2;
+                    document.getElementById("digits").max = 16;
+                    isNumber(document.getElementById("digits"));
+                    document.getElementById("digitsx").style.visibility = "hidden";
+                    document.getElementById("digitsxl").style.visibility = "hidden";
+                    changed = true;
+                }
+                if (document.getElementById("option").value == "SQRT"){
+                    document.getElementById("inputEasyLabel").innerText = "Digits of answer:";
+                    changed = true;
+                    document.getElementById("digits").min = 1;
+                    document.getElementById("digits").max = 5;
+                    isNumber(document.getElementById("digits"));
+                    document.getElementById("digitsx").style.visibility = "hidden";
+                    document.getElementById("digitsxl").style.visibility = "hidden";
+                }
+                if (document.getElementById("option").value == "SQR"){
+                    document.getElementById("inputEasyLabel").innerText = "Digits of problem:";
+                    changed = true;
+                    document.getElementById("digits").min = 1;
+                    document.getElementById("digits").max = 16;
+                    isNumber(document.getElementById("digits"));
+                    document.getElementById("digitsx").style.visibility = "visible";
+                    document.getElementById("digitsxl").style.visibility = "visible";
+                }
+                if (changed == false){
+                    document.getElementById("inputEasyLabel").style.visibility = "hidden";
+                    document.getElementById("digits").style.visibility = "hidden";
+                    document.getElementById("digitsx").style.visibility = "hidden";
+                    document.getElementById("digitsxl").style.visibility = "hidden";
+                }            
+            }
+            function onLoad(){
+                divisionMode();
+            }
+            function isNumber(inp){
+                var val = parseInt(inp.value);
+                var min = inp.min;
+                var max = inp.max;
+                if(inp.value != ""){
+                    if (Number.isInteger(val) == false){
+                        inp.value = min;
+                    }
+                    if (val > max){
+                        inp.value = max;
+                    }
+                    if (val < min){
+                        inp.value = min;
+                    }
+                    inp.value = Math.round(inp.value);
+                }
+                else{
+                    inp.value = "";
+                }
+            }
+            function fracView(){
+                if(document.getElementById("option").value == "Frac"){
+                    document.getElementById("optionFrac").style.visibility = "visible";
+                    document.getElementById("optionFrac").style.width = "auto";
+                }
+                else{
+                    document.getElementById("optionFrac").style.visibility = "hidden"; 
+                    document.getElementById("optionFrac").style.width = "0";                   
+                }
+            }
+        </script>
+        <style>
+            #answer2{
+                visibility: hidden;	    
+            }
+            #optionFrac{
+                visibility: hidden;
+                width: 0;	    
+            }
+            #output{
+                width: 120px;
+                float: left;
+                font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+                font-size: 14px;
+                font-style: normal;
+                font-variant: normal;
+                font-weight: 400;
+                line-height: 20px;
+            }
+            #outputx{
+                width: 120px;
+                float:left;
+                font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+                font-size: 14px;
+                font-style: normal;
+                font-variant: normal;
+                font-weight: 400;
+                line-height: 20px;
+            }
+            #output2{
+                float:right;
+                font-size: 100%;
+                width: 100px;
+                font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+                font-size: 14px;
+                font-style: normal;
+                font-variant: normal;
+                font-weight: 400;
+                line-height: 20px;
+            }
+            #header{
+                height: 70px;
+                width: 500px;
+                /* visibility: hidden */
+            }
+            @media print{
+                #header{
+                    visibility: visible;
+                }
+                #output{
+                    float: left;
+                }     
+                #output2{
+                    float:right;
+                }   
+                .noPrint{
+                    visibility: hidden;
+                }          
+            }
+            #overlay {
+                position: fixed;
+                display: none;
+                width: 100%;
+                height: 100%;
+                top: 0; 
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 2;
+                cursor: pointer
+            }
+            #menu {
+                position: fixed; 
+                display: none;
+                width: 50%;
+                height: 50%;
+                top: 25%;
+                left: 25%;
+                right: 25%;
+                bottom: 25%;
+                background-color: rgba(255, 255, 255, 1);
+                z-index: 10; 
+                cursor: pointer;
+            }
+            .tooltip {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+            }
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 120px;
+                background-color: black;
+                color: #fff;
+                text-align: center;
+                padding: 5px 0;
+                border-radius: 6px;
+                position: absolute;
+                z-index: 1;
+            }
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+            }
+        </style>
+    </head>
+    <body>
+        <select id="option" class="noPrint" onchange="changeMode();fracView();">
+            <option value="Division">Division</option>
+            <option value="Multiplication">Multiplication</option>
+            <option value="SQRT">Square Root</option>
+            <option value="SQR">Squares</option> <!-- Called squares, actualy exponents. -->
+            <option value="Frac">Fraction</option>
+        </select>
+        <select id="optionFrac" class="noPrint">
+            <option value="AddFractions">Add Fractions</option>
+            <option value="SubFractions">Subtract Fractions</option>
+            <option value="SimpFractions">Simplify Fractions</option>
+            <option value="MFRAC">Multiply Fractions</option>
+            <option value="MFRAC">Divide Fractions</option>
+        </select>
+        <input type="button" onclick="createProblems(window);" value="Go" class="noPrint"/>
+        <span class="noPrint" id="inputEasyLabel">Difficulty (1-5):</span>
+        <input class="noPrint" type="number" id="digits" onchange="isNumber(this);" class="noPrint" max="5" min="1" value="1"/>
+        <span style="visibility:hidden;" id="digitsxl">Exponent:</span>
+        <input class="noPrint" type="number" id="digitsx" onchange="isNumber(this);" class="noPrint" max="5" min="2" value="2" style="visibility:hidden;" size="3"/></br>
+        <input type="button" onclick="window.print();" value="Print" class="noPrint"/>
+        <input type="button" onclick="hideAnswers();" id="HSButton" value="Hide Answers" class="noPrint"/>
+        <input type="button" onclick="showAdvance();" id="SAButton" value="Show Advanced Menu" class="noPrint"/>
+        <div id="header">
+            </div>
+        <div id="outputs">
+            <div id="output" class="output">
+            Questions
+            </div>
+            <div id="output2">
+            Answers
+            </div>
+        </div>
+        <div id="overlay"></div>
+        <div id="menu">
+            <div style="height: 20%; width: 35%; float: left;">
+                <table style="width:100%">
+                    <tr>
+                        <td>Font size:</td>
+                        <td>
+                            <select onchange="changeFontSize(this.value);" style="width: 75%;">
+                                <option value="s" style="font-size:100%">Small</option>
+                                <option value="m" style="font-size:150%">Medium</option>
+                                <option value="l" style="font-size:200%">Large</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Line Spaces:</td>
+                        <td><input style="width: 75%;" onchange="isNumber(this);" onclick="spaces = this.value;" type="number" class="noPrint" max="5" min="1" value="4"/></td>
+                    </tr>
+                    <tr>
+                        <td>Number of problems:</td>
+                        <td><input style="width: 75%;" onchange="isNumber(this);probs = this.value;" type="number" class="noPrint" max="50" min="5" value="10"/></td>
+                    </tr>
+                    <tr>
+                        <td>Problems per line:</td>
+                        <td><input style="width: 75%;" onchange="isNumber(this);probsPerLine = this.value;" type="number" class="noPrint" max="20" min="1" value="10"/></td>
+                    </tr>
+                    <tr>
+                        <td>Numbering mode:</td>
+                        <td>
+                            <select onchange="PNM = this.value;" style="width: 75%;">
+                                <option value=0>x. </option>
+                                <option value=1>(x)</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <br/><div style="float: left; width: 50%;">
+                Fractions:<br/><br/>
+                <text title="Use the same denominator for fraction problems; means students do not have to convert fractions to same form.">Use same denominator:  </text><text onclick="doSameDen();" id="sameDenChanger">False</text><br/>
+                <text title="After doing fraction problems simplify answer; means students have to simplyfy their answers after solving the problem.">Simplify answer for fraction problems:  </text><text onclick="doSimpAft();" id="simpAftChanger">False</text>
+            </div><br/>
+            <input type="button" onclick="hideAdvance();" id="SAButton" value="Done" class="noPrint"/>
+        </div>
+        <div style="width:0%;height:0%;" id="outputBox"></div>
+    </body>
+</html>
