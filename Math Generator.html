@@ -207,10 +207,10 @@
                     var a = n1 * n2;
                     changeOutputCol(i)
                     if (Omode==0){
-                        document.getElementById("output").innerHTML += "<div>" + out(i) + n1.toLocaleString() + "<br/>&nbsp<u>" + ' × ' + n2.toLocaleString() + "</u></div>" + "<br/>".repeat(spaces-1);
+                        document.getElementById("output").innerHTML += "<div>" + out(i) + n1.toLocaleString() + "<br/>&nbsp<u>" + ' * ' + n2.toLocaleString() + "</u></div>" + "<br/>".repeat(spaces-1);
                     }
                     if (Omode==1){
-                        document.getElementById("output").innerHTML += out(i) + n1.toLocaleString() + ' × ' + n2.toLocaleString() + " = " + "<br/>".repeat(spaces);
+                        document.getElementById("output").innerHTML += out(i) + n1.toLocaleString() + ' * ' + n2.toLocaleString() + " = " + "<br/>".repeat(spaces);
                     }
                     document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
                 }
@@ -231,10 +231,10 @@
                     var n = a * a;
                     changeOutputCol(i)
                     if (Omode==0){
-                        document.getElementById("output").innerHTML += out(i) + ' √<span style="text-decoration: overline">' + n.toLocaleString() + "</span> = " + "<br/>".repeat(spaces);
+                        document.getElementById("output").innerHTML += out(i) + ' &#10003;<span style="text-decoration: overline">' + n.toLocaleString() + "</span> = " + "<br/>".repeat(spaces);
                     }
                     if (Omode==1){
-                        document.getElementById("output").innerHTML += out(i) + ' √ ' + n.toLocaleString() + " = " + "<br/>".repeat(spaces);
+                        document.getElementById("output").innerHTML += out(i) + ' &#10003;<span style="text-decoration: overline">' n.toLocaleString() + '</span>'+ " = " + "<br/>".repeat(spaces);
                     }
 
                     document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
