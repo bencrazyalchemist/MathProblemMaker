@@ -13,8 +13,8 @@
             var PNM = 0; //Problem Number Mode, the way of outputing the problem number 1 is 'i+". "'. 2 is '"("+i+") "'
             var numDirec = 0; //Direction of numbering for problems. 0 is horizontal and 1 is verticle.
 
-            function rNum(i){
-                var rows = Math.ceil(probs/probsPerLine);
+            function rNum(i){// attempt to number problems horizontaly with more than one row of questions.
+                var rows = Math.ceil(probs/probsPerLine);//currently does not work
                 var x = i % rows;
                 var y = i % probsPerLine; //starts at top of page
                 if(numDirec==0){
@@ -26,8 +26,8 @@
                 return newI;
             }
             function out(i){
-                i = rNum(i);
-                if(PNM==0){
+                i = rNum(i);//creates numbering system, either .1 xxx or (1) xxx
+                if(PNM==0){//plan to implement lettering for problems
                     return i + ". ";
                 }
                 if(PNM==1){
@@ -53,15 +53,15 @@
                     return 0;
                 }
             }
-            function getLen(number) {
+            function getLen(number) { //simple function to get the length in digits of a number.
                 return number.toString().length;
             }
-            var countDecimals = function (value) {  
-                if ((value % 1) != 0) 
+            var countDecimals = function (value) {  //same as above but counts decimal digits, got this on code stackoverflow 
+                if ((value % 1) != 0)
                     return value.toString().split(".")[1].length;  
                 return 0;
             };
-            function reduce(numerator,denominator){
+            function reduce(numerator,denominator){ //for reducing fractions, I got this code online and I have no idea how it works.
                 var gcd = function gcd(a,b){
                     return b ? gcd(b, a%b) : a;
                 };
@@ -83,7 +83,7 @@
                     var a = n1 / n2;
                     if(countDecimals(a) == d){
                         changeOutputCol(i)
-                    if (Omode==0){
+                    if (Omode==0){//Uses "|" and overline to make division shape
                         document.getElementById("output").innerHTML += out(i) + "<br/>&nbsp&nbsp&nbsp&nbsp" + n2 + "|<span style='text-decoration: overline'>" + n1.toLocaleString() + "</span>" + "<br/>".repeat(spaces-1);
                     }
                     if (Omode==1){
