@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Math Problem Generator 0.6.5</title>
+        <title>Math Problem Generator 0.6.7</title>
         <script>
             //this copy has implementation of output mode two. 
             var currentWindow = window; //no longer neccesary but need to check for uses
@@ -13,12 +13,12 @@
             var PNM = 0; //Problem Number Mode, the way of outputing the problem number 1 is 'i+". "'. 2 is '"("+i+") "'
             var numDirec = 0; //Direction of numbering for problems. 0 is horizontal and 1 is verticle.
 
-            function rNum(i){
-                var x1 = i;
-                var y = i % probsPerLine;
-                alert(y + " , " + x1);
+            function rNum(i){// attempt to number problems horizontaly with more than one row of questions.
+                var rows = Math.ceil(probs/probsPerLine);//currently does not work
+                var x = i % rows;
+                var y = i % probsPerLine; //starts at top of page
                 if(numDirec==0){
-                var newI = i;
+                var newI = x + y*rows;
                 }
                 if(numDirec==1){
                 var newI = x*probsPerLine + y + function(){if(y==0);return 1;};
@@ -26,8 +26,8 @@
                 return newI;
             }
             function out(i){
-                i = rNum(i);
-                if(PNM==0){
+                i = rNum(i);//creates numbering system, either .1 xxx or (1) xxx
+                if(PNM==0){//plan to implement lettering for problems
                     return i + ". ";
                 }
                 if(PNM==1){
@@ -53,15 +53,15 @@
                     return 0;
                 }
             }
-            function getLen(number) {
+            function getLen(number) { //simple function to get the length in digits of a number.
                 return number.toString().length;
             }
-            var countDecimals = function (value) {  
-                if ((value % 1) != 0) 
+            var countDecimals = function (value) {  //same as above but counts decimal digits, got this on code stackoverflow 
+                if ((value % 1) != 0)
                     return value.toString().split(".")[1].length;  
                 return 0;
             };
-            function reduce(numerator,denominator){
+            function reduce(numerator,denominator){ //for reducing fractions, I got this code online and I have no idea how it works.
                 var gcd = function gcd(a,b){
                     return b ? gcd(b, a%b) : a;
                 };
@@ -83,7 +83,7 @@
                     var a = n1 / n2;
                     if(countDecimals(a) == d){
                         changeOutputCol(i)
-                    if (Omode==0){
+                    if (Omode==0){//Uses "|" and overline to make division shape
                         document.getElementById("output").innerHTML += out(i) + "<br/>&nbsp&nbsp&nbsp&nbsp" + n2 + "|<span style='text-decoration: overline'>" + n1.toLocaleString() + "</span>" + "<br/>".repeat(spaces-1);
                     }
                     if (Omode==1){
@@ -207,10 +207,10 @@
                     var a = n1 * n2;
                     changeOutputCol(i)
                     if (Omode==0){
-                        document.getElementById("output").innerHTML += "<div>" + out(i) + n1.toLocaleString() + "<br/>&nbsp<u>" + ' * ' + n2.toLocaleString() + "</u></div>" + "<br/>".repeat(spaces-1);
+                        document.getElementById("output").innerHTML += "<div>" + out(i) + n1.toLocaleString() + ' &times; ' + n2.toLocaleString() + "</div>" + "<br/>".repeat(spaces);
                     }
                     if (Omode==1){
-                        document.getElementById("output").innerHTML += out(i) + n1.toLocaleString() + ' * ' + n2.toLocaleString() + " = " + "<br/>".repeat(spaces);
+                        document.getElementById("output").innerHTML += out(i) + n1.toLocaleString() + ' &times; ' + n2.toLocaleString() + " = " + "<br/>".repeat(spaces);
                     }
                     document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
                 }
@@ -220,8 +220,7 @@
                     var n = random(digits);
                     var a = n * n;
                     changeOutputCol(i)
-                    alert("hi");
-                    document.getElementById("output").innerHTML += out(i) + n.toLocaleString() + "<sup>2</sup> = " + "<br/>".repeat(spaces);
+                    document.getElementById("output").innerHTML += out(i) + n.toLocaleString() + " = " + "<br/>".repeat(spaces);
                     document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
                 }
             }   
@@ -231,10 +230,10 @@
                     var n = a * a;
                     changeOutputCol(i)
                     if (Omode==0){
-                        document.getElementById("output").innerHTML += out(i) + ' &#10003;<span style="text-decoration: overline">' + n.toLocaleString() + "</span> = " + "<br/>".repeat(spaces);
+                        document.getElementById("output").innerHTML += out(i) + ' &check;<span style="text-decoration: overline">' + n.toLocaleString() + "</span> = " + "<br/>".repeat(spaces);
                     }
                     if (Omode==1){
-                        document.getElementById("output").innerHTML += out(i) + ' &#10003;<span style="text-decoration: overline">' n.toLocaleString() + '</span>'+ " = " + "<br/>".repeat(spaces);
+                        document.getElementById("output").innerHTML += out(i) + ' &check; ' + n.toLocaleString() + " = " + "<br/>".repeat(spaces);
                     }
 
                     document.getElementById("output2").innerHTML += out(i) + a.toLocaleString() + "<br/>";
@@ -250,8 +249,6 @@
                 if(document.getElementById("option").value == "Multiplication"){
                     multiplication(document.getElementById("digits").value);
                     var digits = document.getElementById("digits").value;
-                    if (Math.ceil(digits/2) != 1){var pl1 = "s"}else{pl1 = ""}
-                    if (Math.floor(digits/2) != 1){var pl2 = "s"}else{pl2 = ""}
                 
                 }
                 if (document.getElementById("option").value == "Frac"){
